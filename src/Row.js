@@ -1,4 +1,11 @@
 import React,{useState,useEffect} from 'react'
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+
 import YouTube from 'react-youtube';
 import axios from './axios';
 import './Row.css';
@@ -8,6 +15,18 @@ const url="https://image.tmdb.org/t/p/w500";
 
 function Row({title,fetchUrl,isLarge}) {
 
+
+    const [open, setOpen] = React.useState(false);
+
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
+    
+    {/*被選到的電影資料*/}
+    const [choosemovie,setchoosemovie]=useState([]);
+
+    {/*全部的電影資料*/}
     const [movies,setMovies]=useState([]);
     const [trailerUrl,setTrailerUrl]=useState("");
 
@@ -36,12 +55,13 @@ function Row({title,fetchUrl,isLarge}) {
 //*https://pjchender.blogspot.com/2018/08/js-javascript-url-parameters.html 網址解析教學 */
     const handleClick=(movie) =>{
 
-        
+        setOpen(true);
+
         if(trailerUrl){
             setTrailerUrl("");
         }
         else{
-
+            setchoosemovie(movie);
             movieTrailer(movie?.name || "" || movie?.title)
             .then(url=>{
                 //https://www.youtube.com/watch?v=kJQP7kiw5Fk&ab_channel=LuisFonsiVEVO
@@ -75,9 +95,30 @@ function Row({title,fetchUrl,isLarge}) {
                     )
 
                 )}
+
+
                 </div>
+                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">{choosemovie.title}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                  <h3>大綱</h3>{choosemovie.overview}
+                  </DialogContentText>
+                </DialogContent>
+                <DialogContent>
+                <DialogContentText>
+                <h1>分數 {choosemovie.vote_average}</h1> 
+                </DialogContentText>
+              </DialogContent>
+
+              </Dialog>
+        
+
+
+        
                 {/*if ( have trailerUrl) then show youtube  */}
                 {trailerUrl && <YouTube videoId={trailerUrl} opts={opts} />}
+
         </div>
     )
 }
